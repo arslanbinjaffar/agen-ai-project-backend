@@ -8,10 +8,10 @@ const { runRAG } = require("../rag/ragService");
  const chatController = async (req, res) => {
   const { message } = req.body;
 
-  const intent = detectIntent(message);
+  const intent = await detectIntent(message);
 
   let result;
-
+  console.log(`Detected intent: ${intent}`);
   if (intent === "agent") {
     result = await runAgent(message);
   } else if (intent === "rag") {

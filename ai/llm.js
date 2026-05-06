@@ -30,7 +30,7 @@ async function run() {
   try {
     const response = await ai.models.generateContent({
       // Use the stable 2.5 model
-      model: "gemini-2.5-flash-lite", 
+      model: "gemma3:27b-it",
       contents: prompt,
     });
     console.log(response.text);
@@ -41,14 +41,42 @@ async function run() {
 // run();
 
 
+// async function askLLM(prompt) {
+//  const response = await ai.models.generateContent({
+//       // Use the stable 2.5 model
+//       model: "gemma3:27b-it", 
+//       contents: prompt,
+//     });
+//   return response.text;
+// }
+async function listAvailableModels() {
+  try {
+    // In the newer SDK, you list models via a specific method
+    // Note: This often requires the 'v1' or 'v1beta' endpoint
+    const response = await fetch(`https://googleapis.com{process.env.GEMMI_API_KEY}`);
+    const data = await response.json();
+    console.log("Available Models:", data.models.map(m => m.name));
+  } catch (e) {
+    console.error("Could not list models:", e.message);
+  }
+}
 async function askLLM(prompt) {
- const response = await ai.models.generateContent({
-      // Use the stable 2.5 model
-      model: "gemini-2.5-flash-lite", 
-      contents: prompt,
+  try {
+    await listAvailableModels(); // List models to verify availability
+    // 1. Initialize the model with the explicit 'models/' prefix
+    const model = ai.getGenerativeModel({ model: "models/gemma-4-31b-it" }); 
+
+    // 2. Format contents correctly
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
     });
 
-  return response.text;
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error("Detailed Error:", error);
+    throw error;
+  }
 }
 
 module.exports = { askLLM ,ai};

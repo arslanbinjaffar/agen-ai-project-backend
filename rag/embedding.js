@@ -14,7 +14,7 @@ async function createEmbedding(text) {
   // return res.data.embedding;
    const response = await ai.models.generateContent({
       // Use the stable 2.5 model
-      model: "gemini-2.5-flash-lite", 
+      model: "gemma-3-27b", 
       contents: text,
     });
 
